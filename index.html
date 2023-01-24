@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rick&Morty's characters</title>
+    <style>
+      @font-face {
+        font-family: "get_schwifty";
+        src: url("./src/fonts/get_schwifty-webfont.eot");
+        src: url("./src/fonts/get_schwifty-webfont.eot?#iefix")
+            format("embedded-opentype"),
+          url("./src/fonts/get_schwifty-webfont.woff2") format("woff2"),
+          url("./src/fonts/get_schwifty-webfont.woff") format("woff"),
+          url("./src/fonts/get_schwifty-webfont.ttf") format("truetype"),
+          url("./src/fonts/get_schwifty-webfont.svg#get_schwiftyregular")
+            format("svg");
+        font-weight: 400;
+        font-style: normal;
+      }
+      body {
+        font-family: "Open Sans", sans-serif;
+      }
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      img {
+        width: 100%;
+      }
+      h1 {
+        text-align: center;
+        font-weight: 900;
+        font-size: 80px;
+        text-transform: uppercase;
+        padding-bottom: 30px;
+        font-family: "get_schwifty";
+      }
+      .container {
+        margin: 0 auto;
+        max-width: 1400px;
+        padding: 0 16px;
+      }
+      .navigation {
+        display: grid;
+        grid-template-columns: 1fr 11fr;
+        align-items: center;
+        gap: 20px;
+      }
+      .select__container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .button__container {
+        height: 200px;
+        overflow: auto;
+      }
+      .movie__container {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        width: 100%;
+        grid-gap: 16px;
+        padding: 30px 0;
+        margin: 0 auto;
+      }
+
+      .movie__img {
+        display: block;
+        width: 100%;
+      }
+
+      .movie__item {
+        padding: 16px;
+        border: 1px solid;
+        display: flex;
+        gap: 8px;
+        flex-direction: column;
+        width: 100%;
+        font-size: 16px;
+        border-radius: 5px;
+      }
+      .movie__item_dead {
+        background-color: rgba(166, 164, 164, 0.3);
+      }
+      .movie__name {
+        height: 60px;
+        font-family: "get_schwifty";
+      }
+      .movie__data {
+        font-size: 12px;
+      }
+      @media screen and (max-width: 360px) {
+        .movie__container {
+          grid-template-columns: repeat(1, 1fr);
+        }
+        .navigation {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+        h1 {
+          font-size: 30px;
+        }
+      }
+      @media screen and (min-width: 361px) and (max-width: 500px) {
+        .movie__container {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        h1 {
+          font-size: 35px;
+        }
+      }
+      @media screen and (min-width: 501px) and (max-width: 768px) {
+        .movie__container {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        h1 {
+          font-size: 40px;
+        }
+      }
+      @media screen and (min-width: 769px) and (max-width: 1024px) {
+        .movie__container {
+          grid-template-columns: repeat(4, 1fr);
+        }
+        h1 {
+          font-size: 80px;
+        }
+      }
+      .button__container {
+        padding: 30px 0 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(166, 164, 164, 0.3);
+        padding: 3px 5px;
+        width: fit-content;
+        border: 1px solid;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+      }
+      .button:hover {
+        background-color: black;
+        color: white;
+      }
+      .button.active {
+        background-color: rgb(70, 69, 69);
+        color: white;
+      }
+      label b {
+        display: block;
+      }
+      .select__species,
+      .select__status {
+        width: 150px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="header__image_wrapper">
+          <img src="./src/img/logo.png" alt="logo" />
+        </div>
+        <h1>Characters List</h1>
+      </div>
+
+      <nav class="navigation">
+        <div class="select__container">
+          <label for="species"
+            ><b>Species:</b>
+            <select class="select__species" name="" id="species">
+              <option value="all">all</option>
+            </select></label
+          >
+          <label for="status"
+            ><b>Status:</b>
+            <select class="select__status" name="" id="">
+              <option value="all">all</option>
+            </select></label
+          >
+        </div>
+        <div class="button__container"></div>
+      </nav>
+      <section class="movie">
+        <div class="movie__container"></div>
+      </section>
+    </div>
+
+    <script>
+      const containerItems = document.querySelector(".movie__container");
+      const containerButtons = document.querySelector(".button__container");
+      const selectSpecies = document.querySelector(".select__species");
+      const selectStatus = document.querySelector(".select__status");
+
+      fetch(`https://rickandmortyapi.com/api/character?page=1`)
+        .then((data) => data.json())
+        .then((data) => newArr(data))
+        .catch((err) => console.log("Error:", err));
+
+      for (let i = 1; i <= 42; i++) {
+        let buttonPage = document.createElement("span");
+        buttonPage.classList.add("button");
+        buttonPage.value = i;
+        buttonPage.innerText = `Page ${i}`;
+        containerButtons.appendChild(buttonPage);
+        buttonPage.addEventListener("click", (e) => {
+          let buttonPages = document.querySelectorAll(".button");
+          for (let i = 0; i < buttonPages.length; i++) {
+            if (buttonPages[i].classList.contains("active")) {
+              buttonPages[i].classList.remove("active");
+            }
+          }
+          buttonPage.classList.add("active");
+          fetch(
+            `https://rickandmortyapi.com/api/character?page=${e.target.value}`
+          )
+            .then((data) => data.json())
+            .then((data) => newArr(data))
+            .catch((err) => console.log("Error:", err));
+        });
+      }
+      document.querySelectorAll(".button")[0].classList.add("active");
+      function createItem(element) {
+        let item = document.createElement("div");
+        let nameOfCharacter = document.createElement("h2");
+        let imageOfCharacter = document.createElement("img");
+        let genderOfCharacter = document.createElement("div");
+        let aliveCharacter = document.createElement("div");
+        let specieOfCharacter = document.createElement("div");
+        let dateOfBirthCharacter = document.createElement("div");
+
+        item.classList.add("movie__item");
+        nameOfCharacter.classList.add("movie__name");
+        imageOfCharacter.classList.add("movie__img");
+        genderOfCharacter.classList.add("movie__gen");
+        aliveCharacter.classList.add("movie__alive");
+        specieOfCharacter.classList.add("movie__species");
+        dateOfBirthCharacter.classList.add("movie__data");
+
+        nameOfCharacter.innerHTML = element.name;
+        genderOfCharacter.innerHTML = `Gender: <b> ${element.gender} </b>`;
+        aliveCharacter.innerHTML = `Health status: <b> ${element.status} </b>`;
+        specieOfCharacter.innerHTML = `Specie: <b> ${element.species} </b>`;
+        dateOfBirthCharacter.innerHTML = `
+            First Appearance: <i> ${element.created.slice(0, 10)} </i>
+            `;
+        imageOfCharacter.src = element.image;
+        if (element.status === "Dead") {
+          item.classList.add("movie__item_dead");
+        }
+
+        item.append(
+          nameOfCharacter,
+          imageOfCharacter,
+          genderOfCharacter,
+          aliveCharacter,
+          specieOfCharacter,
+          dateOfBirthCharacter
+        );
+
+        return item;
+      }
+
+      function newArr(newData) {
+        containerItems.innerHTML = "";
+        selectSpecies.innerHTML = `<option value="all">all</option>`;
+        selectStatus.innerHTML = `<option value="all">all</option>`;
+        let arr = newData.results;
+        let selectSpeciesArray = [];
+        let selectStatusArray = [];
+
+        arr.map((item) => {
+          let newItem = createItem(item);
+          containerItems.append(newItem);
+          if (!selectSpeciesArray.includes(item.species)) {
+            selectSpeciesArray.push(item.species);
+          }
+          if (!selectStatusArray.includes(item.status)) {
+            selectStatusArray.push(item.status);
+          }
+        });
+
+        selectStatus.onchange = () => {
+          if (selectStatus.value !== "all") {
+            containerItems.innerHTML = "";
+            let array = arr.filter(
+              (element) => element.status === selectStatus.value
+            );
+            array.map((item) => {
+              let newItem = createItem(item);
+              containerItems.append(newItem);
+            });
+          } else {
+            containerItems.innerHTML = "";
+            arr.map((item) => {
+              let newItem = createItem(item);
+              containerItems.append(newItem);
+            });
+          }
+        };
+
+        selectSpecies.onchange = () => {
+          if (selectSpecies.value !== "all") {
+            containerItems.innerHTML = "";
+            let array = arr.filter(
+              (element) => element.species === selectSpecies.value
+            );
+            array.map((item) => {
+              let newItem = createItem(item);
+              containerItems.append(newItem);
+            });
+          } else {
+            containerItems.innerHTML = "";
+            arr.map((item) => {
+              let newItem = createItem(item);
+              containerItems.append(newItem);
+            });
+          }
+        };
+
+        selectSpeciesArray.forEach((item) => {
+          let newOption = createOption(item);
+          selectSpecies.appendChild(newOption);
+        });
+        selectStatusArray.forEach((item) => {
+          let newOption = createOption(item);
+          selectStatus.appendChild(newOption);
+        });
+      }
+
+      function createOption(item) {
+        let option = document.createElement("option");
+        option.setAttribute("value", item);
+        option.innerText = item;
+        return option;
+      }
+    </script>
+  </body>
+</html>
