@@ -214,21 +214,20 @@
       fetch(`https://rickandmortyapi.com/api/character`)
         .then((data) => data.json())
         .then((data) => {
-          newArr(data);
-          pages = data.info.pages;
+          showPage(data);
           createButtons(data);
         })
         .catch((err) => console.log("Error:", err));
 
-      function newArr(newData) {
+      function showPage(data) {
         containerItems.innerHTML = "";
         selectSpecies.innerHTML = `<option value="all">all</option>`;
         selectStatus.innerHTML = `<option value="all">all</option>`;
-        let arr = newData.results;
+        let characters = data.results;
         let selectSpeciesArray = [];
         let selectStatusArray = [];
 
-        arr.map((item) => {
+        characters.map((item) => {
           let newItem = createItem(item);
           containerItems.append(newItem);
           if (!selectSpeciesArray.includes(item.species)) {
@@ -249,9 +248,10 @@
         });
 
         selectStatus.onchange = () => {
+          selectSpecies.value = "all";
           if (selectStatus.value !== "all") {
             containerItems.innerHTML = "";
-            let array = arr.filter(
+            let array = characters.filter(
               (element) => element.status === selectStatus.value
             );
             array.map((item) => {
@@ -260,7 +260,7 @@
             });
           } else {
             containerItems.innerHTML = "";
-            arr.map((item) => {
+            characters.map((item) => {
               let newItem = createItem(item);
               containerItems.append(newItem);
             });
@@ -268,9 +268,10 @@
         };
 
         selectSpecies.onchange = () => {
+          selectStatus.value = "all";
           if (selectSpecies.value !== "all") {
             containerItems.innerHTML = "";
-            let array = arr.filter(
+            let array = characters.filter(
               (element) => element.species === selectSpecies.value
             );
             array.map((item) => {
@@ -279,7 +280,7 @@
             });
           } else {
             containerItems.innerHTML = "";
-            arr.map((item) => {
+            characters.map((item) => {
               let newItem = createItem(item);
               containerItems.append(newItem);
             });
@@ -287,9 +288,11 @@
         };
 
         searchCharacter.onkeyup = () => {
+          selectSpecies.value = "all";
+          selectStatus.value = "all";
           containerItems.innerHTML = "";
           if (searchCharacter.value) {
-            let array = arr.filter((item) =>
+            let array = characters.filter((item) =>
               item.name.toLowerCase().includes(searchCharacter.value)
             );
             array.map((item) => {
@@ -297,7 +300,7 @@
               containerItems.append(newItem);
             });
           } else {
-            arr.map((item) => {
+            characters.map((item) => {
               let newItem = createItem(item);
               containerItems.append(newItem);
             });
@@ -348,10 +351,10 @@
         return item;
       }
 
-      function createOption(item) {
+      function createOption(element) {
         let option = document.createElement("option");
-        option.setAttribute("value", item);
-        option.innerText = item;
+        option.setAttribute("value", element);
+        option.innerText = element;
         return option;
       }
 
@@ -363,6 +366,7 @@
           buttonPage.innerText = `Page ${i}`;
           containerButtons.appendChild(buttonPage);
           buttonPage.addEventListener("click", (e) => {
+            searchCharacter.value = "";
             let buttonPages = document.querySelectorAll(".button");
             for (let i = 0; i < buttonPages.length; i++) {
               if (buttonPages[i].classList.contains("active")) {
@@ -374,7 +378,7 @@
               `https://rickandmortyapi.com/api/character?page=${e.target.value}`
             )
               .then((data) => data.json())
-              .then((data) => newArr(data))
+              .then((data) => showPage(data))
               .catch((err) => console.log("Error:", err));
           });
         }
