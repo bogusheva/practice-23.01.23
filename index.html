@@ -187,10 +187,12 @@
           >
           <label for="status"
             ><b>Status:</b>
-            <select class="select__status" name="" id="">
+            <select class="select__status" name="" id="status">
               <option value="all">all</option>
             </select></label
           >
+          <label for="search"><b>Find character:</b></label>
+          <input type="search" class="search__character" />
         </div>
         <div class="button__container"></div>
       </nav>
@@ -204,6 +206,7 @@
       const containerButtons = document.querySelector(".button__container");
       const selectSpecies = document.querySelector(".select__species");
       const selectStatus = document.querySelector(".select__status");
+      const searchCharacter = document.querySelector(".search__character");
 
       fetch(`https://rickandmortyapi.com/api/character?page=1`)
         .then((data) => data.json())
@@ -233,46 +236,6 @@
         });
       }
       document.querySelectorAll(".button")[0].classList.add("active");
-      function createItem(element) {
-        let item = document.createElement("div");
-        let nameOfCharacter = document.createElement("h2");
-        let imageOfCharacter = document.createElement("img");
-        let genderOfCharacter = document.createElement("div");
-        let aliveCharacter = document.createElement("div");
-        let specieOfCharacter = document.createElement("div");
-        let dateOfBirthCharacter = document.createElement("div");
-
-        item.classList.add("movie__item");
-        nameOfCharacter.classList.add("movie__name");
-        imageOfCharacter.classList.add("movie__img");
-        genderOfCharacter.classList.add("movie__gen");
-        aliveCharacter.classList.add("movie__alive");
-        specieOfCharacter.classList.add("movie__species");
-        dateOfBirthCharacter.classList.add("movie__data");
-
-        nameOfCharacter.innerHTML = element.name;
-        genderOfCharacter.innerHTML = `Gender: <b> ${element.gender} </b>`;
-        aliveCharacter.innerHTML = `Health status: <b> ${element.status} </b>`;
-        specieOfCharacter.innerHTML = `Specie: <b> ${element.species} </b>`;
-        dateOfBirthCharacter.innerHTML = `
-            First Appearance: <i> ${element.created.slice(0, 10)} </i>
-            `;
-        imageOfCharacter.src = element.image;
-        if (element.status === "Dead") {
-          item.classList.add("movie__item_dead");
-        }
-
-        item.append(
-          nameOfCharacter,
-          imageOfCharacter,
-          genderOfCharacter,
-          aliveCharacter,
-          specieOfCharacter,
-          dateOfBirthCharacter
-        );
-
-        return item;
-      }
 
       function newArr(newData) {
         containerItems.innerHTML = "";
@@ -291,6 +254,15 @@
           if (!selectStatusArray.includes(item.status)) {
             selectStatusArray.push(item.status);
           }
+        });
+
+        selectSpeciesArray.forEach((item) => {
+          let newOption = createOption(item);
+          selectSpecies.appendChild(newOption);
+        });
+        selectStatusArray.forEach((item) => {
+          let newOption = createOption(item);
+          selectStatus.appendChild(newOption);
         });
 
         selectStatus.onchange = () => {
@@ -331,14 +303,65 @@
           }
         };
 
-        selectSpeciesArray.forEach((item) => {
-          let newOption = createOption(item);
-          selectSpecies.appendChild(newOption);
-        });
-        selectStatusArray.forEach((item) => {
-          let newOption = createOption(item);
-          selectStatus.appendChild(newOption);
-        });
+        searchCharacter.onkeyup = () => {
+          console.log(searchCharacter.value);
+          containerItems.innerHTML = "";
+          if (searchCharacter.value) {
+            let array = arr.filter((item) =>
+              item.name.toLowerCase().includes(searchCharacter.value)
+            );
+            array.map((item) => {
+              let newItem = createItem(item);
+              containerItems.append(newItem);
+            });
+          } else {
+            arr.map((item) => {
+              let newItem = createItem(item);
+              containerItems.append(newItem);
+            });
+          }
+        };
+      }
+
+      function createItem(element) {
+        let item = document.createElement("div");
+        let nameOfCharacter = document.createElement("h2");
+        let imageOfCharacter = document.createElement("img");
+        let genderOfCharacter = document.createElement("div");
+        let aliveCharacter = document.createElement("div");
+        let specieOfCharacter = document.createElement("div");
+        let dateOfBirthCharacter = document.createElement("div");
+
+        item.classList.add("movie__item");
+        nameOfCharacter.classList.add("movie__name");
+        imageOfCharacter.classList.add("movie__img");
+        genderOfCharacter.classList.add("movie__gen");
+        aliveCharacter.classList.add("movie__alive");
+        specieOfCharacter.classList.add("movie__species");
+        dateOfBirthCharacter.classList.add("movie__data");
+
+        nameOfCharacter.innerHTML = element.name;
+        genderOfCharacter.innerHTML = `Gender: <b> ${element.gender} </b>`;
+        aliveCharacter.innerHTML = `Health status: <b> ${element.status} </b>`;
+        specieOfCharacter.innerHTML = `Specie: <b> ${element.species} </b>`;
+        dateOfBirthCharacter.innerHTML = `
+            First Appearance: <i> ${element.created.slice(0, 10)} </i>
+            `;
+        imageOfCharacter.src = element.image;
+        if (element.status === "Dead") {
+          item.classList.add("movie__item_dead");
+        }
+
+        item.append(
+          nameOfCharacter,
+          imageOfCharacter,
+          genderOfCharacter,
+          aliveCharacter,
+          specieOfCharacter,
+          dateOfBirthCharacter
+        );
+
+        return item;
       }
 
       function createOption(item) {
