@@ -87,6 +87,9 @@
       .movie__item_dead {
         background-color: rgba(166, 164, 164, 0.3);
       }
+      .movie__item_alive {
+        background-color: rgb(62, 235, 134, 0.2);
+      }
       .movie__name {
         height: 60px;
         font-family: "get_schwifty";
@@ -208,34 +211,14 @@
       const selectStatus = document.querySelector(".select__status");
       const searchCharacter = document.querySelector(".search__character");
 
-      fetch(`https://rickandmortyapi.com/api/character?page=1`)
+      fetch(`https://rickandmortyapi.com/api/character`)
         .then((data) => data.json())
-        .then((data) => newArr(data))
+        .then((data) => {
+          newArr(data);
+          pages = data.info.pages;
+          createButtons(data);
+        })
         .catch((err) => console.log("Error:", err));
-
-      for (let i = 1; i <= 42; i++) {
-        let buttonPage = document.createElement("span");
-        buttonPage.classList.add("button");
-        buttonPage.value = i;
-        buttonPage.innerText = `Page ${i}`;
-        containerButtons.appendChild(buttonPage);
-        buttonPage.addEventListener("click", (e) => {
-          let buttonPages = document.querySelectorAll(".button");
-          for (let i = 0; i < buttonPages.length; i++) {
-            if (buttonPages[i].classList.contains("active")) {
-              buttonPages[i].classList.remove("active");
-            }
-          }
-          buttonPage.classList.add("active");
-          fetch(
-            `https://rickandmortyapi.com/api/character?page=${e.target.value}`
-          )
-            .then((data) => data.json())
-            .then((data) => newArr(data))
-            .catch((err) => console.log("Error:", err));
-        });
-      }
-      document.querySelectorAll(".button")[0].classList.add("active");
 
       function newArr(newData) {
         containerItems.innerHTML = "";
@@ -304,7 +287,6 @@
         };
 
         searchCharacter.onkeyup = () => {
-          console.log(searchCharacter.value);
           containerItems.innerHTML = "";
           if (searchCharacter.value) {
             let array = arr.filter((item) =>
@@ -350,6 +332,8 @@
         imageOfCharacter.src = element.image;
         if (element.status === "Dead") {
           item.classList.add("movie__item_dead");
+        } else if (element.status === "Alive") {
+          item.classList.add("movie__item_alive");
         }
 
         item.append(
@@ -369,6 +353,32 @@
         option.setAttribute("value", item);
         option.innerText = item;
         return option;
+      }
+
+      function createButtons(data) {
+        for (let i = 1; i <= data.info.pages; i++) {
+          let buttonPage = document.createElement("span");
+          buttonPage.classList.add("button");
+          buttonPage.value = i;
+          buttonPage.innerText = `Page ${i}`;
+          containerButtons.appendChild(buttonPage);
+          buttonPage.addEventListener("click", (e) => {
+            let buttonPages = document.querySelectorAll(".button");
+            for (let i = 0; i < buttonPages.length; i++) {
+              if (buttonPages[i].classList.contains("active")) {
+                buttonPages[i].classList.remove("active");
+              }
+            }
+            buttonPage.classList.add("active");
+            fetch(
+              `https://rickandmortyapi.com/api/character?page=${e.target.value}`
+            )
+              .then((data) => data.json())
+              .then((data) => newArr(data))
+              .catch((err) => console.log("Error:", err));
+          });
+        }
+        document.querySelectorAll(".button")[0].classList.add("active");
       }
     </script>
   </body>
