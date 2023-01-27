@@ -106,7 +106,7 @@
 
       .movie__item {
         position: relative;
-        padding: 16px;
+        padding: 16px 16px 10px;
         border: 1px solid;
         display: flex;
         gap: 8px;
@@ -128,6 +128,10 @@
       .movie__data {
         font-size: 12px;
       }
+      .movie__episode {
+        align-self: flex-end;
+      }
+
       @media screen and (max-width: 360px) {
         .movie__container {
           grid-template-columns: repeat(1, 1fr);
@@ -174,7 +178,9 @@
         gap: 12px;
       }
       .button,
-      .show-favorite {
+      .show-favorite,
+      .movie__episode,
+      .button_close {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -187,7 +193,9 @@
         transition: all 0.3s ease-in-out;
       }
       .button:hover,
-      .show-favorite:hover {
+      .show-favorite:hover,
+      .movie__episode:hover,
+      .button_close:hover {
         background-color: black;
         color: white;
       }
@@ -221,6 +229,43 @@
       .icon-heart_unactive.favorite {
         color: #16acc9;
         cursor: pointer;
+      }
+
+      .episode__window {
+        width: 50vw;
+        height: 50vh;
+        overflow-y: scroll;
+        position: absolute;
+        top: 0;
+        right: 0;
+        translate: -50% 50%;
+        border: 3px solid black;
+        border-radius: 5px;
+        background-color: white;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 30px;
+        padding: 16px;
+        font-size: 25px;
+      }
+      .episode__name {
+        font-size: 45px;
+        text-align: center;
+        font-weight: 900;
+      }
+      .episode__characters_container {
+        display: grid;
+        width: 100%;
+        grid-template-columns: repeat(4, 2fr);
+        gap: 20px;
+      }
+      .button_close {
+        font-size: 30px;
+        font-weight: 700;
+        padding: 10px 16px;
       }
     </style>
   </head>
@@ -263,7 +308,10 @@
       const selectSpecies = document.querySelector(".select__species");
       const selectStatus = document.querySelector(".select__status");
       const searchCharacter = document.querySelector(".search__character");
-      let favoriteCharacters = [];
+      if (!localStorage.getItem("favorite")) {
+        localStorage.setItem("favorite", JSON.stringify([]));
+      }
+      let favoriteCharacters = JSON.parse(localStorage.getItem("favorite"));
 
       fetch(`https://rickandmortyapi.com/api/character`)
         .then((data) => data.json())
@@ -369,6 +417,7 @@
         let aliveCharacter = document.createElement("div");
         let specieOfCharacter = document.createElement("div");
         let dateOfBirthCharacter = document.createElement("div");
+        let episode = document.createElement("span");
         let heartIcon = document.createElement("span");
 
         item.classList.add("movie__item");
@@ -378,6 +427,7 @@
         aliveCharacter.classList.add("movie__alive");
         specieOfCharacter.classList.add("movie__species");
         dateOfBirthCharacter.classList.add("movie__data");
+        episode.classList.add("movie__episode");
         heartIcon.classList.add("icon-heart");
         heartIcon.classList.add("icon-heart_unactive");
         favoriteCharacters.forEach((item) => {
@@ -399,6 +449,7 @@
               }
             }
           }
+          localStorage.setItem("favorite", JSON.stringify(favoriteCharacters));
         });
 
         nameOfCharacter.innerHTML = element.name;
@@ -408,12 +459,31 @@
         dateOfBirthCharacter.innerHTML = `
             First Appearance: <i> ${element.created.slice(0, 10)} </i>
             `;
+        episode.innerHTML = `Episode: <b"> ${element.episode[0].slice(
+          40
+        )} </b>`;
         imageOfCharacter.src = element.image;
         if (element.status === "Dead") {
           item.classList.add("movie__item_dead");
         } else if (element.status === "Alive") {
           item.classList.add("movie__item_alive");
         }
+        episode.addEventListener("click", () => {
+          window.scrollTo({
+            top: 100,
+            behavior: "smooth",
+          });
+          fetch(
+            `https://rickandmortyapi.com/api/episode/${element.episode[0].slice(
+              40
+            )}`
+          )
+            .then((data) => data.json())
+            .then((data) => {
+              createEpisodeWindow(data);
+            })
+            .catch((err) => console.log("Error:", err));
+        });
 
         item.append(
           heartIcon,
@@ -422,7 +492,8 @@
           genderOfCharacter,
           aliveCharacter,
           specieOfCharacter,
-          dateOfBirthCharacter
+          dateOfBirthCharacter,
+          episode
         );
 
         return item;
@@ -478,6 +549,68 @@
             containerItems.append(newItem);
           });
         });
+      }
+
+      function createEpisodeWindow(data) {
+        let episodeWindow = document.createElement("div");
+        episodeWindow.classList.add("episode__window");
+        let episodeName = document.createElement("h2");
+        let episodeAirDate = document.createElement("h3");
+        let episodeCharactersContainer = document.createElement("div");
+        let episodeCharacterHeading = document.createElement("h4");
+        let closeButton = document.createElement("span");
+
+        episodeName.classList.add("episode__name");
+        episodeAirDate.classList.add(".episode-date");
+        episodeCharactersContainer.classList.add(
+          "episode__characters_container"
+        );
+        closeButton.classList.add("button_close");
+
+        closeButton.addEventListener("click", () => {
+          episodeWindow.remove();
+        });
+
+        episodeName.innerText = `Episode: ${data.episode} - ${data.name}`;
+        episodeAirDate.innerText = `Air Date: ${data.air_date}`;
+        episodeCharacterHeading.innerText = "Characters:";
+        closeButton.innerText = "Close";
+
+        data.characters.map((item) => {
+          fetch(item)
+            .then((data) => data.json())
+            .then((data) => {
+              let newItem = createWindowItem(data);
+              episodeCharactersContainer.appendChild(newItem);
+            })
+            .catch((err) => console.log("Error:", err));
+        });
+
+        episodeWindow.append(
+          episodeName,
+          episodeAirDate,
+          episodeCharacterHeading,
+          episodeCharactersContainer,
+          closeButton
+        );
+        document.body.appendChild(episodeWindow);
+      }
+
+      function createWindowItem(data) {
+        let item = document.createElement("div");
+        let nameOfCharacter = document.createElement("h2");
+        let imageOfCharacter = document.createElement("img");
+
+        item.classList.add("movie__item");
+        nameOfCharacter.classList.add("movie__name");
+        imageOfCharacter.classList.add("movie__img");
+
+        nameOfCharacter.innerText = data.name;
+        imageOfCharacter.src = data.image;
+
+        item.append(nameOfCharacter, imageOfCharacter);
+
+        return item;
       }
     </script>
   </body>
