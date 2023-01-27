@@ -19,6 +19,36 @@
         font-weight: 400;
         font-style: normal;
       }
+      @font-face {
+        font-family: "icomoon";
+        src: url("./src/fonts/icomoon.eot?h2zaos");
+        src: url("./src/fonts/icomoon.eot?h2zaos#iefix")
+            format("embedded-opentype"),
+          url("./src/fonts/icomoon.ttf?h2zaos") format("truetype"),
+          url("./src/fonts/icomoon.woff?h2zaos") format("woff"),
+          url("./src/fonts/icomoon.svg?h2zaos#icomoon") format("svg");
+        font-weight: normal;
+        font-style: normal;
+        font-display: block;
+      }
+
+      [class^="icon-"],
+      [class*=" icon-"] {
+        /* use !important to prevent issues with browser extensions that change fonts */
+        font-family: "icomoon" !important;
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1;
+        /* Better Font Rendering =========== */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      .icon-heart:before {
+        content: "\e9da";
+      }
       body {
         font-family: "Open Sans", sans-serif;
       }
@@ -75,6 +105,7 @@
       }
 
       .movie__item {
+        position: relative;
         padding: 16px;
         border: 1px solid;
         display: flex;
@@ -142,7 +173,8 @@
         flex-wrap: wrap;
         gap: 12px;
       }
-      .button {
+      .button,
+      .show-favorite {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -154,7 +186,8 @@
         cursor: pointer;
         transition: all 0.3s ease-in-out;
       }
-      .button:hover {
+      .button:hover,
+      .show-favorite:hover {
         background-color: black;
         color: white;
       }
@@ -162,12 +195,32 @@
         background-color: rgb(70, 69, 69);
         color: white;
       }
+      .show-favorite {
+        padding: 6px 8px;
+        border: 1px solid black;
+        transition: all 0.3s ease-in-out;
+      }
+
       label b {
         display: block;
       }
       .select__species,
       .select__status {
         width: 150px;
+      }
+      .icon-heart_unactive {
+        font-size: 30px;
+        color: rgb(168, 206, 239);
+        text-shadow: 5px 5px 5px rgb(199 220 239);
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        transition: all 0.3s ease-in-out;
+      }
+      .icon-heart_unactive:hover,
+      .icon-heart_unactive.favorite {
+        color: #16acc9;
+        cursor: pointer;
       }
     </style>
   </head>
@@ -210,20 +263,20 @@
       const selectSpecies = document.querySelector(".select__species");
       const selectStatus = document.querySelector(".select__status");
       const searchCharacter = document.querySelector(".search__character");
+      let favoriteCharacters = [];
 
       fetch(`https://rickandmortyapi.com/api/character`)
         .then((data) => data.json())
         .then((data) => {
-          showPage(data);
+          showPage(data.results);
           createButtons(data);
         })
         .catch((err) => console.log("Error:", err));
 
-      function showPage(data) {
+      function showPage(characters) {
         containerItems.innerHTML = "";
         selectSpecies.innerHTML = `<option value="all">all</option>`;
         selectStatus.innerHTML = `<option value="all">all</option>`;
-        let characters = data.results;
         let selectSpeciesArray = [];
         let selectStatusArray = [];
 
@@ -316,6 +369,7 @@
         let aliveCharacter = document.createElement("div");
         let specieOfCharacter = document.createElement("div");
         let dateOfBirthCharacter = document.createElement("div");
+        let heartIcon = document.createElement("span");
 
         item.classList.add("movie__item");
         nameOfCharacter.classList.add("movie__name");
@@ -324,6 +378,28 @@
         aliveCharacter.classList.add("movie__alive");
         specieOfCharacter.classList.add("movie__species");
         dateOfBirthCharacter.classList.add("movie__data");
+        heartIcon.classList.add("icon-heart");
+        heartIcon.classList.add("icon-heart_unactive");
+        favoriteCharacters.forEach((item) => {
+          if (item.id == element.id) {
+            heartIcon.classList.add("favorite");
+          }
+        });
+        heartIcon.addEventListener("click", () => {
+          heartIcon.classList.toggle("favorite");
+          let isInArray = favoriteCharacters.some(
+            (item) => item.id == element.id
+          );
+          if (!isInArray) {
+            favoriteCharacters.push(element);
+          } else {
+            for (let i = 0; i < favoriteCharacters.length; i++) {
+              if (favoriteCharacters[i].id == element.id) {
+                favoriteCharacters.splice(i, 1);
+              }
+            }
+          }
+        });
 
         nameOfCharacter.innerHTML = element.name;
         genderOfCharacter.innerHTML = `Gender: <b> ${element.gender} </b>`;
@@ -340,6 +416,7 @@
         }
 
         item.append(
+          heartIcon,
           nameOfCharacter,
           imageOfCharacter,
           genderOfCharacter,
@@ -368,7 +445,7 @@
           buttonPage.addEventListener("click", (e) => {
             searchCharacter.value = "";
             let buttonPages = document.querySelectorAll(".button");
-            for (let i = 0; i < buttonPages.length; i++) {
+            for (let i = 0; i < data.info.pages; i++) {
               if (buttonPages[i].classList.contains("active")) {
                 buttonPages[i].classList.remove("active");
               }
@@ -378,11 +455,29 @@
               `https://rickandmortyapi.com/api/character?page=${e.target.value}`
             )
               .then((data) => data.json())
-              .then((data) => showPage(data))
+              .then((data) => showPage(data.results))
               .catch((err) => console.log("Error:", err));
           });
         }
         document.querySelectorAll(".button")[0].classList.add("active");
+
+        let favoriteButton = document.createElement("span");
+        favoriteButton.classList.add("icon-heart");
+        favoriteButton.classList.add("show-favorite");
+        containerButtons.appendChild(favoriteButton);
+        favoriteButton.addEventListener("click", () => {
+          containerItems.innerHTML = "";
+          let buttonPages = document.querySelectorAll(".button");
+          for (let i = 0; i < data.info.pages; i++) {
+            if (buttonPages[i].classList.contains("active")) {
+              buttonPages[i].classList.remove("active");
+            }
+          }
+          favoriteCharacters.map((item) => {
+            let newItem = createItem(item);
+            containerItems.append(newItem);
+          });
+        });
       }
     </script>
   </body>
