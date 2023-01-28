@@ -15,7 +15,7 @@
           <div class="theme-toggle__wrapper">
             <span class="theme-toggle__circle">&#127763;</span>
           </div>
-          <div class="login__wrapper">Login</div>
+          <div class="login__wrapper">Log in</div>
           <div class="login-window">
             <form action="#" class="login-form">
               <input type="text" placeholder="login" class="input__login" />
@@ -36,15 +36,17 @@
                 />Remember me</label
               >
               <div class="password-validation"></div>
-              <input type="submit" value="Log in" class="login-button button" />
+              <input type="submit" value="Log in" class="login-button" />
             </form>
           </div>
+        </div>
+        <div class="hero-section">
           <div class="header__image_wrapper">
             <img src="./src/img/logo.png" alt="logo" />
           </div>
           <h1>Characters List</h1>
         </div>
-        <nav class="navigation">
+        <section class="section__navigation">
           <div class="select__container">
             <label for="species"
               ><b>Species:</b>
@@ -58,14 +60,24 @@
                 <option value="all">all</option>
               </select></label
             >
-            <label for="search"><b>Find character:</b></label>
-            <input type="search" class="search__character" />
+            <label for="search"
+              ><b>Find character:</b
+              ><input type="search" class="search__character" />
+            </label>
           </div>
-          <div class="button__container"></div>
-        </nav>
+          <div class="button__container">
+            <span class="button icon-heart show-favorite"></span>
+            <span class="button all-button">Show all</span>
+          </div>
+        </section>
         <section class="movie">
+          <div class="loader__box" hidden>
+            <p class="loader__text">Wait some seconds, please!</p>
+            <p class="icon-spinner9 loader__icon"></p>
+          </div>
           <div class="movie__container"></div>
         </section>
+        <div class="icon-circle-up up-button"></div>
       </div>
     </div>
   </body>

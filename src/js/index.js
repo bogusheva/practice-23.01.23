@@ -7,6 +7,13 @@ themeToggle.addEventListener("click", () => {
   bodyContainer.classList.toggle("dark");
 });
 
+const loader = document.querySelector(".loader__box");
+const scrollUpButton = document.querySelector(".up-button");
+
+scrollUpButton.addEventListener("click", () => {
+  scrollUp();
+});
+
 const loginFormButton = document.querySelector(".login__wrapper");
 const loginWindow = document.querySelector(".login-window");
 const loginButton = document.querySelector(".login-button");
@@ -90,6 +97,51 @@ fetch(`https://rickandmortyapi.com/api/character`)
     createButtons(data);
   })
   .catch((err) => console.log("Error:", err));
+
+function getAllCharacters(number) {
+  const arr = [];
+  containerItems.innerHTML = "";
+  if (!JSON.parse(sessionStorage.getItem("allCharacters"))) {
+    new Promise((resolve, reject) => {
+      loader.hidden = false;
+      setTimeout(() => {
+        for (let i = 1; i <= 400; i++) {
+          fetch(`https://rickandmortyapi.com/api/character/${i}`)
+            .then((data) => data.json())
+            .then((data) => {
+              arr.push(data);
+            })
+            .catch((err) => console.log(err));
+        }
+        resolve();
+      }, 2000);
+      setTimeout(() => {
+        for (let i = 401; i <= number; i++) {
+          fetch(`https://rickandmortyapi.com/api/character/${i}`)
+            .then((data) => data.json())
+            .then((data) => {
+              arr.push(data);
+            })
+            .catch((err) => console.log(err));
+        }
+        resolve();
+      }, 2000);
+    }).catch((err) => console.log("Error: ", err));
+    setTimeout(() => {
+      if (arr.length === number) {
+        sessionStorage.setItem(
+          "allCharacters",
+          JSON.stringify(arr.sort((a, b) => a.id - b.id))
+        );
+      }
+      showPage(arr.sort((a, b) => a.id - b.id));
+      loader.hidden = true;
+      console.log(arr.length);
+    }, 5000);
+  } else {
+    showPage(JSON.parse(sessionStorage.getItem("allCharacters")));
+  }
+}
 
 function showPage(characters) {
   containerItems.innerHTML = "";
@@ -235,10 +287,7 @@ function createItem(element) {
     item.classList.add("movie__item_alive");
   }
   episode.addEventListener("click", () => {
-    window.scrollTo({
-      top: 100,
-      behavior: "smooth",
-    });
+    scrollUp();
     fetch(
       `https://rickandmortyapi.com/api/episode/${element.episode[0].slice(40)}`
     )
@@ -277,14 +326,10 @@ function createButtons(data) {
     buttonPage.value = i;
     buttonPage.innerText = `Page ${i}`;
     containerButtons.appendChild(buttonPage);
+
     buttonPage.addEventListener("click", (e) => {
       searchCharacter.value = "";
-      let buttonPages = document.querySelectorAll(".button");
-      for (let i = 0; i < data.info.pages; i++) {
-        if (buttonPages[i].classList.contains("active")) {
-          buttonPages[i].classList.remove("active");
-        }
-      }
+      changeActiveButton();
       buttonPage.classList.add("active");
       fetch(`https://rickandmortyapi.com/api/character?page=${e.target.value}`)
         .then((data) => data.json())
@@ -292,24 +337,24 @@ function createButtons(data) {
         .catch((err) => console.log("Error:", err));
     });
   }
-  document.querySelectorAll(".button")[0].classList.add("active");
+  document.querySelectorAll(".button")[2].classList.add("active");
 
-  let favoriteButton = document.createElement("span");
-  favoriteButton.classList.add("icon-heart");
-  favoriteButton.classList.add("show-favorite");
-  containerButtons.appendChild(favoriteButton);
+  let favoriteButton = document.querySelector(".show-favorite");
   favoriteButton.addEventListener("click", () => {
     containerItems.innerHTML = "";
-    let buttonPages = document.querySelectorAll(".button");
-    for (let i = 0; i < data.info.pages; i++) {
-      if (buttonPages[i].classList.contains("active")) {
-        buttonPages[i].classList.remove("active");
-      }
-    }
+    changeActiveButton();
+    favoriteButton.classList.add("active");
     favoriteCharacters.map((item) => {
       let newItem = createItem(item);
       containerItems.append(newItem);
     });
+  });
+
+  let showAllButton = document.querySelector(".all-button");
+  showAllButton.addEventListener("click", (e) => {
+    changeActiveButton();
+    showAllButton.classList.add("active");
+    getAllCharacters(data.info.count);
   });
 }
 
@@ -323,7 +368,7 @@ function createEpisodeWindow(data) {
   let closeButton = document.createElement("span");
 
   episodeName.classList.add("episode__name");
-  episodeAirDate.classList.add(".episode-date");
+  episodeAirDate.classList.add("episode__date");
   episodeCharactersContainer.classList.add("episode__characters_container");
   closeButton.classList.add("button_close");
 
@@ -353,7 +398,7 @@ function createEpisodeWindow(data) {
     episodeCharactersContainer,
     closeButton
   );
-  document.body.appendChild(episodeWindow);
+  document.querySelector(".body-container").appendChild(episodeWindow);
 }
 
 function createWindowItem(data) {
@@ -371,4 +416,21 @@ function createWindowItem(data) {
   item.append(nameOfCharacter, imageOfCharacter);
 
   return item;
+}
+
+function changeActiveButton() {
+  searchCharacter.value = "";
+  let buttonPages = document.querySelectorAll(".button");
+  for (let i = 0; i < buttonPages.length; i++) {
+    if (buttonPages[i].classList.contains("active")) {
+      buttonPages[i].classList.remove("active");
+    }
+  }
+}
+
+function scrollUp() {
+  window.scrollTo({
+    top: 100,
+    behavior: "smooth",
+  });
 }
