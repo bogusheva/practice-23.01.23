@@ -4,614 +4,69 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./src/css/style.css" />
     <title>Rick&Morty's characters</title>
-    <style>
-      @font-face {
-        font-family: "get_schwifty";
-        src: url("./src/fonts/get_schwifty-webfont.eot");
-        src: url("./src/fonts/get_schwifty-webfont.eot?#iefix")
-            format("embedded-opentype"),
-          url("./src/fonts/get_schwifty-webfont.woff2") format("woff2"),
-          url("./src/fonts/get_schwifty-webfont.woff") format("woff"),
-          url("./src/fonts/get_schwifty-webfont.ttf") format("truetype"),
-          url("./src/fonts/get_schwifty-webfont.svg#get_schwiftyregular")
-            format("svg");
-        font-weight: 400;
-        font-style: normal;
-      }
-      @font-face {
-        font-family: "icomoon";
-        src: url("./src/fonts/icomoon.eot?h2zaos");
-        src: url("./src/fonts/icomoon.eot?h2zaos#iefix")
-            format("embedded-opentype"),
-          url("./src/fonts/icomoon.ttf?h2zaos") format("truetype"),
-          url("./src/fonts/icomoon.woff?h2zaos") format("woff"),
-          url("./src/fonts/icomoon.svg?h2zaos#icomoon") format("svg");
-        font-weight: normal;
-        font-style: normal;
-        font-display: block;
-      }
-
-      [class^="icon-"],
-      [class*=" icon-"] {
-        /* use !important to prevent issues with browser extensions that change fonts */
-        font-family: "icomoon" !important;
-        font-style: normal;
-        font-weight: normal;
-        font-variant: normal;
-        text-transform: none;
-        line-height: 1;
-        /* Better Font Rendering =========== */
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
-
-      .icon-heart:before {
-        content: "\e9da";
-      }
-      body {
-        font-family: "Open Sans", sans-serif;
-      }
-      *,
-      *::before,
-      *::after {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      img {
-        width: 100%;
-      }
-      h1 {
-        text-align: center;
-        font-weight: 900;
-        font-size: 80px;
-        text-transform: uppercase;
-        padding-bottom: 30px;
-        font-family: "get_schwifty";
-      }
-      .container {
-        margin: 0 auto;
-        max-width: 1400px;
-        padding: 0 16px;
-      }
-      .navigation {
-        display: grid;
-        grid-template-columns: 1fr 11fr;
-        align-items: center;
-        gap: 20px;
-      }
-      .select__container {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-      .button__container {
-        height: 200px;
-        overflow: auto;
-      }
-      .movie__container {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        width: 100%;
-        grid-gap: 16px;
-        padding: 30px 0;
-        margin: 0 auto;
-      }
-
-      .movie__img {
-        display: block;
-        width: 100%;
-      }
-
-      .movie__item {
-        position: relative;
-        padding: 16px 16px 10px;
-        border: 1px solid;
-        display: flex;
-        gap: 8px;
-        flex-direction: column;
-        width: 100%;
-        font-size: 16px;
-        border-radius: 5px;
-      }
-      .movie__item_dead {
-        background-color: rgba(166, 164, 164, 0.3);
-      }
-      .movie__item_alive {
-        background-color: rgb(62, 235, 134, 0.2);
-      }
-      .movie__name {
-        height: 60px;
-        font-family: "get_schwifty";
-      }
-      .movie__data {
-        font-size: 12px;
-      }
-      .movie__episode {
-        align-self: flex-end;
-      }
-
-      @media screen and (max-width: 360px) {
-        .movie__container {
-          grid-template-columns: repeat(1, 1fr);
-        }
-        .navigation {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-        }
-        h1 {
-          font-size: 30px;
-        }
-      }
-      @media screen and (min-width: 361px) and (max-width: 500px) {
-        .movie__container {
-          grid-template-columns: repeat(2, 1fr);
-        }
-        h1 {
-          font-size: 35px;
-        }
-      }
-      @media screen and (min-width: 501px) and (max-width: 768px) {
-        .movie__container {
-          grid-template-columns: repeat(3, 1fr);
-        }
-        h1 {
-          font-size: 40px;
-        }
-      }
-      @media screen and (min-width: 769px) and (max-width: 1024px) {
-        .movie__container {
-          grid-template-columns: repeat(4, 1fr);
-        }
-        h1 {
-          font-size: 80px;
-        }
-      }
-      .button__container {
-        padding: 30px 0 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 12px;
-      }
-      .button,
-      .show-favorite,
-      .movie__episode,
-      .button_close {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: rgba(166, 164, 164, 0.3);
-        padding: 3px 5px;
-        width: fit-content;
-        border: 1px solid;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: all 0.3s ease-in-out;
-      }
-      .button:hover,
-      .show-favorite:hover,
-      .movie__episode:hover,
-      .button_close:hover {
-        background-color: black;
-        color: white;
-      }
-      .button.active {
-        background-color: rgb(70, 69, 69);
-        color: white;
-      }
-      .show-favorite {
-        padding: 6px 8px;
-        border: 1px solid black;
-        transition: all 0.3s ease-in-out;
-      }
-
-      label b {
-        display: block;
-      }
-      .select__species,
-      .select__status {
-        width: 150px;
-      }
-      .icon-heart_unactive {
-        font-size: 30px;
-        color: rgb(168, 206, 239);
-        text-shadow: 5px 5px 5px rgb(199 220 239);
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        transition: all 0.3s ease-in-out;
-      }
-      .icon-heart_unactive:hover,
-      .icon-heart_unactive.favorite {
-        color: #16acc9;
-        cursor: pointer;
-      }
-
-      .episode__window {
-        width: 50vw;
-        height: 50vh;
-        overflow-y: scroll;
-        position: absolute;
-        top: 0;
-        right: 0;
-        translate: -50% 50%;
-        border: 3px solid black;
-        border-radius: 5px;
-        background-color: white;
-        z-index: 100;
-        display: flex;
-        align-items: center;
-        flex-direction: column;
-        justify-content: flex-start;
-        gap: 30px;
-        padding: 16px;
-        font-size: 25px;
-      }
-      .episode__name {
-        font-size: 45px;
-        text-align: center;
-        font-weight: 900;
-      }
-      .episode__characters_container {
-        display: grid;
-        width: 100%;
-        grid-template-columns: repeat(4, 2fr);
-        gap: 20px;
-      }
-      .button_close {
-        font-size: 30px;
-        font-weight: 700;
-        padding: 10px 16px;
-      }
-    </style>
+    <script src="./src/js/index.js" defer></script>
   </head>
   <body>
-    <div class="container">
-      <div class="header">
-        <div class="header__image_wrapper">
-          <img src="./src/img/logo.png" alt="logo" />
+    <div class="body-container">
+      <div class="container">
+        <div class="header">
+          <div class="theme-toggle__wrapper">
+            <span class="theme-toggle__circle">&#127763;</span>
+          </div>
+          <div class="login__wrapper">Login</div>
+          <div class="login-window">
+            <form action="#" class="login-form">
+              <input type="text" placeholder="login" class="input__login" />
+              <label for="password-input" class="label-password">
+                <input
+                  type="password"
+                  id="password-input"
+                  placeholder="password"
+                  class="input__password"
+                />
+                <span class="icon-eye password-hider"></span>
+              </label>
+              <label for="checkbox-login" class="checkbox-text"
+                ><input
+                  type="checkbox"
+                  id="checkbox-login"
+                  class="input__checkbox"
+                />Remember me</label
+              >
+              <div class="password-validation"></div>
+              <input type="submit" value="Log in" class="login-button button" />
+            </form>
+          </div>
+          <div class="header__image_wrapper">
+            <img src="./src/img/logo.png" alt="logo" />
+          </div>
+          <h1>Characters List</h1>
         </div>
-        <h1>Characters List</h1>
+        <nav class="navigation">
+          <div class="select__container">
+            <label for="species"
+              ><b>Species:</b>
+              <select class="select__species" name="" id="species">
+                <option value="all">all</option>
+              </select></label
+            >
+            <label for="status"
+              ><b>Status:</b>
+              <select class="select__status" name="" id="status">
+                <option value="all">all</option>
+              </select></label
+            >
+            <label for="search"><b>Find character:</b></label>
+            <input type="search" class="search__character" />
+          </div>
+          <div class="button__container"></div>
+        </nav>
+        <section class="movie">
+          <div class="movie__container"></div>
+        </section>
       </div>
-
-      <nav class="navigation">
-        <div class="select__container">
-          <label for="species"
-            ><b>Species:</b>
-            <select class="select__species" name="" id="species">
-              <option value="all">all</option>
-            </select></label
-          >
-          <label for="status"
-            ><b>Status:</b>
-            <select class="select__status" name="" id="status">
-              <option value="all">all</option>
-            </select></label
-          >
-          <label for="search"><b>Find character:</b></label>
-          <input type="search" class="search__character" />
-        </div>
-        <div class="button__container"></div>
-      </nav>
-      <section class="movie">
-        <div class="movie__container"></div>
-      </section>
     </div>
-
-    <script>
-      const containerItems = document.querySelector(".movie__container");
-      const containerButtons = document.querySelector(".button__container");
-      const selectSpecies = document.querySelector(".select__species");
-      const selectStatus = document.querySelector(".select__status");
-      const searchCharacter = document.querySelector(".search__character");
-      if (!localStorage.getItem("favorite")) {
-        localStorage.setItem("favorite", JSON.stringify([]));
-      }
-      let favoriteCharacters = JSON.parse(localStorage.getItem("favorite"));
-
-      fetch(`https://rickandmortyapi.com/api/character`)
-        .then((data) => data.json())
-        .then((data) => {
-          showPage(data.results);
-          createButtons(data);
-        })
-        .catch((err) => console.log("Error:", err));
-
-      function showPage(characters) {
-        containerItems.innerHTML = "";
-        selectSpecies.innerHTML = `<option value="all">all</option>`;
-        selectStatus.innerHTML = `<option value="all">all</option>`;
-        let selectSpeciesArray = [];
-        let selectStatusArray = [];
-
-        characters.map((item) => {
-          let newItem = createItem(item);
-          containerItems.append(newItem);
-          if (!selectSpeciesArray.includes(item.species)) {
-            selectSpeciesArray.push(item.species);
-          }
-          if (!selectStatusArray.includes(item.status)) {
-            selectStatusArray.push(item.status);
-          }
-        });
-
-        selectSpeciesArray.forEach((item) => {
-          let newOption = createOption(item);
-          selectSpecies.appendChild(newOption);
-        });
-        selectStatusArray.forEach((item) => {
-          let newOption = createOption(item);
-          selectStatus.appendChild(newOption);
-        });
-
-        selectStatus.onchange = () => {
-          selectSpecies.value = "all";
-          if (selectStatus.value !== "all") {
-            containerItems.innerHTML = "";
-            let array = characters.filter(
-              (element) => element.status === selectStatus.value
-            );
-            array.map((item) => {
-              let newItem = createItem(item);
-              containerItems.append(newItem);
-            });
-          } else {
-            containerItems.innerHTML = "";
-            characters.map((item) => {
-              let newItem = createItem(item);
-              containerItems.append(newItem);
-            });
-          }
-        };
-
-        selectSpecies.onchange = () => {
-          selectStatus.value = "all";
-          if (selectSpecies.value !== "all") {
-            containerItems.innerHTML = "";
-            let array = characters.filter(
-              (element) => element.species === selectSpecies.value
-            );
-            array.map((item) => {
-              let newItem = createItem(item);
-              containerItems.append(newItem);
-            });
-          } else {
-            containerItems.innerHTML = "";
-            characters.map((item) => {
-              let newItem = createItem(item);
-              containerItems.append(newItem);
-            });
-          }
-        };
-
-        searchCharacter.onkeyup = () => {
-          selectSpecies.value = "all";
-          selectStatus.value = "all";
-          containerItems.innerHTML = "";
-          if (searchCharacter.value) {
-            let array = characters.filter((item) =>
-              item.name.toLowerCase().includes(searchCharacter.value)
-            );
-            array.map((item) => {
-              let newItem = createItem(item);
-              containerItems.append(newItem);
-            });
-          } else {
-            characters.map((item) => {
-              let newItem = createItem(item);
-              containerItems.append(newItem);
-            });
-          }
-        };
-      }
-
-      function createItem(element) {
-        let item = document.createElement("div");
-        let nameOfCharacter = document.createElement("h2");
-        let imageOfCharacter = document.createElement("img");
-        let genderOfCharacter = document.createElement("div");
-        let aliveCharacter = document.createElement("div");
-        let specieOfCharacter = document.createElement("div");
-        let dateOfBirthCharacter = document.createElement("div");
-        let episode = document.createElement("span");
-        let heartIcon = document.createElement("span");
-
-        item.classList.add("movie__item");
-        nameOfCharacter.classList.add("movie__name");
-        imageOfCharacter.classList.add("movie__img");
-        genderOfCharacter.classList.add("movie__gen");
-        aliveCharacter.classList.add("movie__alive");
-        specieOfCharacter.classList.add("movie__species");
-        dateOfBirthCharacter.classList.add("movie__data");
-        episode.classList.add("movie__episode");
-        heartIcon.classList.add("icon-heart");
-        heartIcon.classList.add("icon-heart_unactive");
-        favoriteCharacters.forEach((item) => {
-          if (item.id == element.id) {
-            heartIcon.classList.add("favorite");
-          }
-        });
-        heartIcon.addEventListener("click", () => {
-          heartIcon.classList.toggle("favorite");
-          let isInArray = favoriteCharacters.some(
-            (item) => item.id == element.id
-          );
-          if (!isInArray) {
-            favoriteCharacters.push(element);
-          } else {
-            for (let i = 0; i < favoriteCharacters.length; i++) {
-              if (favoriteCharacters[i].id == element.id) {
-                favoriteCharacters.splice(i, 1);
-              }
-            }
-          }
-          localStorage.setItem("favorite", JSON.stringify(favoriteCharacters));
-        });
-
-        nameOfCharacter.innerHTML = element.name;
-        genderOfCharacter.innerHTML = `Gender: <b> ${element.gender} </b>`;
-        aliveCharacter.innerHTML = `Health status: <b> ${element.status} </b>`;
-        specieOfCharacter.innerHTML = `Specie: <b> ${element.species} </b>`;
-        dateOfBirthCharacter.innerHTML = `
-            First Appearance: <i> ${element.created.slice(0, 10)} </i>
-            `;
-        episode.innerHTML = `Episode: <b"> ${element.episode[0].slice(
-          40
-        )} </b>`;
-        imageOfCharacter.src = element.image;
-        if (element.status === "Dead") {
-          item.classList.add("movie__item_dead");
-        } else if (element.status === "Alive") {
-          item.classList.add("movie__item_alive");
-        }
-        episode.addEventListener("click", () => {
-          window.scrollTo({
-            top: 100,
-            behavior: "smooth",
-          });
-          fetch(
-            `https://rickandmortyapi.com/api/episode/${element.episode[0].slice(
-              40
-            )}`
-          )
-            .then((data) => data.json())
-            .then((data) => {
-              createEpisodeWindow(data);
-            })
-            .catch((err) => console.log("Error:", err));
-        });
-
-        item.append(
-          heartIcon,
-          nameOfCharacter,
-          imageOfCharacter,
-          genderOfCharacter,
-          aliveCharacter,
-          specieOfCharacter,
-          dateOfBirthCharacter,
-          episode
-        );
-
-        return item;
-      }
-
-      function createOption(element) {
-        let option = document.createElement("option");
-        option.setAttribute("value", element);
-        option.innerText = element;
-        return option;
-      }
-
-      function createButtons(data) {
-        for (let i = 1; i <= data.info.pages; i++) {
-          let buttonPage = document.createElement("span");
-          buttonPage.classList.add("button");
-          buttonPage.value = i;
-          buttonPage.innerText = `Page ${i}`;
-          containerButtons.appendChild(buttonPage);
-          buttonPage.addEventListener("click", (e) => {
-            searchCharacter.value = "";
-            let buttonPages = document.querySelectorAll(".button");
-            for (let i = 0; i < data.info.pages; i++) {
-              if (buttonPages[i].classList.contains("active")) {
-                buttonPages[i].classList.remove("active");
-              }
-            }
-            buttonPage.classList.add("active");
-            fetch(
-              `https://rickandmortyapi.com/api/character?page=${e.target.value}`
-            )
-              .then((data) => data.json())
-              .then((data) => showPage(data.results))
-              .catch((err) => console.log("Error:", err));
-          });
-        }
-        document.querySelectorAll(".button")[0].classList.add("active");
-
-        let favoriteButton = document.createElement("span");
-        favoriteButton.classList.add("icon-heart");
-        favoriteButton.classList.add("show-favorite");
-        containerButtons.appendChild(favoriteButton);
-        favoriteButton.addEventListener("click", () => {
-          containerItems.innerHTML = "";
-          let buttonPages = document.querySelectorAll(".button");
-          for (let i = 0; i < data.info.pages; i++) {
-            if (buttonPages[i].classList.contains("active")) {
-              buttonPages[i].classList.remove("active");
-            }
-          }
-          favoriteCharacters.map((item) => {
-            let newItem = createItem(item);
-            containerItems.append(newItem);
-          });
-        });
-      }
-
-      function createEpisodeWindow(data) {
-        let episodeWindow = document.createElement("div");
-        episodeWindow.classList.add("episode__window");
-        let episodeName = document.createElement("h2");
-        let episodeAirDate = document.createElement("h3");
-        let episodeCharactersContainer = document.createElement("div");
-        let episodeCharacterHeading = document.createElement("h4");
-        let closeButton = document.createElement("span");
-
-        episodeName.classList.add("episode__name");
-        episodeAirDate.classList.add(".episode-date");
-        episodeCharactersContainer.classList.add(
-          "episode__characters_container"
-        );
-        closeButton.classList.add("button_close");
-
-        closeButton.addEventListener("click", () => {
-          episodeWindow.remove();
-        });
-
-        episodeName.innerText = `Episode: ${data.episode} - ${data.name}`;
-        episodeAirDate.innerText = `Air Date: ${data.air_date}`;
-        episodeCharacterHeading.innerText = "Characters:";
-        closeButton.innerText = "Close";
-
-        data.characters.map((item) => {
-          fetch(item)
-            .then((data) => data.json())
-            .then((data) => {
-              let newItem = createWindowItem(data);
-              episodeCharactersContainer.appendChild(newItem);
-            })
-            .catch((err) => console.log("Error:", err));
-        });
-
-        episodeWindow.append(
-          episodeName,
-          episodeAirDate,
-          episodeCharacterHeading,
-          episodeCharactersContainer,
-          closeButton
-        );
-        document.body.appendChild(episodeWindow);
-      }
-
-      function createWindowItem(data) {
-        let item = document.createElement("div");
-        let nameOfCharacter = document.createElement("h2");
-        let imageOfCharacter = document.createElement("img");
-
-        item.classList.add("movie__item");
-        nameOfCharacter.classList.add("movie__name");
-        imageOfCharacter.classList.add("movie__img");
-
-        nameOfCharacter.innerText = data.name;
-        imageOfCharacter.src = data.image;
-
-        item.append(nameOfCharacter, imageOfCharacter);
-
-        return item;
-      }
-    </script>
   </body>
 </html>
