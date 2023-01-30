@@ -214,6 +214,25 @@ function showPage(characters) {
       });
     }
   };
+  searchCharacter.addEventListener("compositionupdate", (event) => {
+    selectSpecies.value = "all";
+    selectStatus.value = "all";
+    containerItems.innerHTML = "";
+    if (searchCharacter.value) {
+      let array = characters.filter((item) =>
+        item.name.toLowerCase().includes(searchCharacter.value)
+      );
+      array.map((item) => {
+        let newItem = createItem(item);
+        containerItems.append(newItem);
+      });
+    } else {
+      characters.map((item) => {
+        let newItem = createItem(item);
+        containerItems.append(newItem);
+      });
+    }
+  });
 
   searchCharacter.onkeyup = () => {
     selectSpecies.value = "all";
