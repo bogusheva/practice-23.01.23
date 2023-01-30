@@ -214,13 +214,14 @@ function showPage(characters) {
       });
     }
   };
-  searchCharacter.addEventListener("compositionupdate", (event) => {
+
+  searchCharacter.addEventListener("compositionupdate", () => {
     selectSpecies.value = "all";
     selectStatus.value = "all";
     containerItems.innerHTML = "";
     if (searchCharacter.value) {
       let array = characters.filter((item) =>
-        item.name.toLowerCase().includes(searchCharacter.value)
+        item.name.toLowerCase().includes(searchCharacter.value.toLowerCase())
       );
       array.map((item) => {
         let newItem = createItem(item);
@@ -240,7 +241,7 @@ function showPage(characters) {
     containerItems.innerHTML = "";
     if (searchCharacter.value) {
       let array = characters.filter((item) =>
-        item.name.toLowerCase().includes(searchCharacter.value)
+        item.name.toLowerCase().includes(searchCharacter.value.toLowerCase())
       );
       array.map((item) => {
         let newItem = createItem(item);
