@@ -1,89 +1,16 @@
-const bodyContainer = document.querySelector(".body-container");
-const themeToggle = document.querySelector(".theme-toggle__wrapper");
-const themeToggleCircle = document.querySelector(".theme-toggle__circle");
-
-themeToggle.addEventListener("click", () => {
-  themeToggleCircle.classList.toggle("dark");
-  bodyContainer.classList.toggle("dark");
-});
-
 const loader = document.querySelector(".loader__box");
 const scrollUpButton = document.querySelector(".up-button");
-
-scrollUpButton.addEventListener("click", () => {
-  scrollUp();
-});
-
-const loginFormButton = document.querySelector(".login__wrapper");
-const loginWindow = document.querySelector(".login-window");
-const loginButton = document.querySelector(".login-button");
-const loginForm = document.querySelector(".login-form");
-const login = document.querySelector(".input__login");
-const password = document.querySelector(".input__password");
-const checkboxArea = document.querySelector(".checkbox-text");
-const checkboxItem = document.querySelector(".input__checkbox");
-const passwordHider = document.querySelector(".password-hider");
-const passwordValidationArea = document.querySelector(".password-validation");
-
-loginFormButton.addEventListener("click", () => {
-  loginWindow.classList.toggle("visible");
-  password.setAttribute("type", "password");
-  passwordValidationArea.innerText = "";
-
-  login.value = JSON.parse(localStorage.getItem("login"))
-    ? JSON.parse(localStorage.getItem("login"))
-    : "";
-  password.value = JSON.parse(localStorage.getItem("password"))
-    ? JSON.parse(localStorage.getItem("password"))
-    : "";
-  checkboxArea.hidden =
-    JSON.parse(localStorage.getItem("login")) &&
-    JSON.parse(localStorage.getItem("password"))
-      ? true
-      : false;
-});
-
-loginForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  if (checkboxItem.checked === true) {
-    localStorage.setItem("login", JSON.stringify(login.value));
-    localStorage.setItem("password", JSON.stringify(password.value));
-  }
-  if (
-    (login.value === JSON.parse(localStorage.getItem("login")) &&
-      password.value === JSON.parse(localStorage.getItem("password"))) ||
-    (login.value === "admin" && password.value === "admin")
-  ) {
-    passwordValidationArea.style.color = "#16ACC9";
-    passwordValidationArea.innerText = `Hello, ${login.value}, come in.`;
-    setTimeout(() => {
-      loginWindow.classList.toggle("visible");
-    }, 2000);
-  } else {
-    passwordValidationArea.style.color = "red";
-    passwordValidationArea.innerText = `Login/password is wrong. Try again`;
-  }
-});
-
-passwordHider.addEventListener("click", () => {
-  const type =
-    password.getAttribute("type") === "password" ? "text" : "password";
-  password.setAttribute("type", type);
-});
-
-login.addEventListener("keypress", () => {
-  passwordValidationArea.innerText = "";
-});
-
-password.addEventListener("keypress", () => {
-  passwordValidationArea.innerText = "";
-});
-
 const containerItems = document.querySelector(".movie__container");
 const containerButtons = document.querySelector(".button__container");
 const selectSpecies = document.querySelector(".select__species");
 const selectStatus = document.querySelector(".select__status");
 const searchCharacter = document.querySelector(".search__character");
+
+scrollUpButton.addEventListener("click", () => {
+  scrollUp();
+});
+getThemeToggle();
+getLoginForm();
 
 if (!localStorage.getItem("favorite")) {
   localStorage.setItem("favorite", JSON.stringify([]));
@@ -97,6 +24,84 @@ fetch(`https://rickandmortyapi.com/api/character`)
     createButtons(data);
   })
   .catch((err) => console.log("Error:", err));
+
+function getThemeToggle() {
+  const bodyContainer = document.querySelector(".body-container");
+  const themeToggle = document.querySelector(".theme-toggle__wrapper");
+  const themeToggleCircle = document.querySelector(".theme-toggle__circle");
+
+  themeToggle.addEventListener("click", () => {
+    themeToggleCircle.classList.toggle("dark");
+    bodyContainer.classList.toggle("dark");
+  });
+}
+
+function getLoginForm() {
+  const loginFormButton = document.querySelector(".login__wrapper");
+  const loginWindow = document.querySelector(".login-window");
+  const loginButton = document.querySelector(".login-button");
+  const loginForm = document.querySelector(".login-form");
+  const login = document.querySelector(".input__login");
+  const password = document.querySelector(".input__password");
+  const checkboxArea = document.querySelector(".checkbox-text");
+  const checkboxItem = document.querySelector(".input__checkbox");
+  const passwordHider = document.querySelector(".password-hider");
+  const passwordValidationArea = document.querySelector(".password-validation");
+
+  loginFormButton.addEventListener("click", () => {
+    loginWindow.classList.toggle("visible");
+    password.setAttribute("type", "password");
+    passwordValidationArea.innerText = "";
+
+    login.value = JSON.parse(localStorage.getItem("login"))
+      ? JSON.parse(localStorage.getItem("login"))
+      : "";
+    password.value = JSON.parse(localStorage.getItem("password"))
+      ? JSON.parse(localStorage.getItem("password"))
+      : "";
+    checkboxArea.hidden =
+      JSON.parse(localStorage.getItem("login")) &&
+      JSON.parse(localStorage.getItem("password"))
+        ? true
+        : false;
+  });
+
+  loginForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (checkboxItem.checked === true) {
+      localStorage.setItem("login", JSON.stringify(login.value));
+      localStorage.setItem("password", JSON.stringify(password.value));
+    }
+    if (
+      (login.value === JSON.parse(localStorage.getItem("login")) &&
+        password.value === JSON.parse(localStorage.getItem("password"))) ||
+      (login.value === "admin" && password.value === "admin")
+    ) {
+      passwordValidationArea.style.color = "#16ACC9";
+      passwordValidationArea.innerText = `Hello, ${login.value}, come in.`;
+      setTimeout(() => {
+        loginWindow.classList.toggle("visible");
+      }, 2000);
+    } else {
+      passwordValidationArea.style.color = "red";
+      passwordValidationArea.innerText = `Login/password is wrong. Try again`;
+    }
+  });
+
+  passwordHider.addEventListener("click", () => {
+    const type =
+      password.getAttribute("type") === "password" ? "text" : "password";
+    password.setAttribute("type", type);
+  });
+
+  login.addEventListener("keypress", () => {
+    passwordValidationArea.innerText = "";
+  });
+
+  password.addEventListener("keypress", () => {
+    passwordValidationArea.innerText = "";
+  });
+}
 
 function getAllCharacters(number) {
   const arr = [];
